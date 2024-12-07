@@ -1,0 +1,40 @@
+#springboot port
+server:
+  port: 9000
+
+#es & redis
+spring:
+  elasticsearch:
+    port: 9200
+    ip: 10.12.21.50
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 60000
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+
+#线程池配置参数
+thread-pool:
+  core-size: 5            # 核心线程数
+  max-size: 10            # 最大线程数
+  queue-capacity: 50      # 队列容量
+  keep-alive-time: 30    # 线程的最大空闲时间（秒）
+  thread-name-prefix: emailThreadPool
+
+#rocketmq
+rocketmq:
+  name-server: 117.72.83.241:9876
+  producer:
+    group: email-producer
+
+#netty
+nettyserver:
+  ip: 127.0.0.1
+  port: 9500
