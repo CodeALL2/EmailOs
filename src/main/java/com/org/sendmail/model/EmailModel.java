@@ -3,7 +3,6 @@ package com.org.sendmail.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -20,5 +19,7 @@ public class EmailModel implements Serializable {
     private String senderEmail; //发件人邮箱
     private String authCode; //授权码
     private ArrayList<String> accepterEmail; //接受者的邮箱
+    private String sendTime; //邮件的发送时间戳
+    private String acceptTime; //邮件接收的时间戳
 }
 

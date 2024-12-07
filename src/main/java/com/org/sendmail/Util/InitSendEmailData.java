@@ -47,14 +47,15 @@ public class InitSendEmailData {
             mimeMessage.setFrom(new InternetAddress(senderEmail));
             mimeMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(accepterEmail));        // Set To: 头部头字段
             mimeMessage.setSubject(subject);
-            mimeMessage.setText(text);
+            mimeMessage.setContent(text, "text/html;charset=UTF-8");
             Transport.send(mimeMessage);
         } catch (MessagingException e) {
             log.error("{}邮件发送失败", accepterEmail);
             e.printStackTrace();
             return;
         }
-        log.info("邮件成功发送: {}->{}", senderEmail, accepterEmail);
+        long nowTime = System.currentTimeMillis() / 1000; //秒级
+        log.info("{} 邮件成功发送: {}->{}", senderEmail, accepterEmail, TimestampToDate.toTime(nowTime));
     }
 
     public Session createSSLSocket(){

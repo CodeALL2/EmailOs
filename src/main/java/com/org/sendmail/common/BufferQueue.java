@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ArrayBlockingQueue;
-
 /**
  * 邮件缓冲队列 防止线程池被高吞吐量压垮
  *

@@ -4,7 +4,6 @@ package com.org.sendmail.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -27,5 +26,9 @@ public class EmailRedisModel implements Serializable {
     private String text;
     //业务id号
     private Integer operationId;
+    //目标用户希望发送的时间点
+    private String time;
+    //邮件类型
+    private int type;
     //频率设置
 }

@@ -1,3 +1,4 @@
+
 rocketmq:
   name-server: 117.72.83.241:9876
 
@@ -9,7 +10,6 @@ thread-pool:
   keep-alive-time: 60    # 线程的最大空闲时间（秒）
   thread-name-prefix: emailThreadPool
   sum: 2 #线程池的个数
-
 
 spring:
   elasticsearch:
@@ -27,7 +27,8 @@ spring:
           max-idle: 8
           min-idle: 0
           max-wait: -1ms
-
+server:
+  port: 8601
 
 
 

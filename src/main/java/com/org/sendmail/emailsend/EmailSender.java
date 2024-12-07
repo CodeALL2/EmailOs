@@ -51,7 +51,6 @@ public class EmailSender implements Runnable{
             log.error("{} 在redis中未发现此邮件", redisKey);
             return;
         }
-
         String subject = emailRedisModel.getSubject();
         String text = emailRedisModel.getText();
 
