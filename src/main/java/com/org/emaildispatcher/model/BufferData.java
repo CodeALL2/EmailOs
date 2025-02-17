@@ -6,5 +6,5 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class BufferData {
-    private String redisKey;
+    private String emailId;
 }

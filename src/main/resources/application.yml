@@ -1,16 +1,12 @@
 #springboot port
 server:
-  port: 9000
+  port: 9001
 
 #es & redis
 spring:
-  elasticsearch:
-    port: 9200
-    ip: 10.12.21.50
-
   data:
     redis:
-      host: localhost
+      host: 127.0.0.1
       port: 6379
       timeout: 60000
       lettuce:
@@ -19,6 +15,12 @@ spring:
           max-idle: 8
           min-idle: 0
           max-wait: -1ms
+elasticsearch:
+  host: 127.0.0.1
+  port: 9200
+
+timerQueue:
+  name: TIMER_TASK
 
 #线程池配置参数
 thread-pool:
@@ -30,11 +32,13 @@ thread-pool:
 
 #rocketmq
 rocketmq:
-  name-server: 117.72.83.241:9876
+  name-server: 112.35.176.43:9876
   producer:
     group: email-producer
 
-#netty
-nettyserver:
-  ip: 127.0.0.1
-  port: 9500
+
+logging:
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  level:
+    root: INFO

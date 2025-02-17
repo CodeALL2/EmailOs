@@ -1,12 +1,11 @@
 package com.org.emaildispatcher.centralcontrol;
 
 import com.org.emaildispatcher.brige.BufferQueue;
-import com.org.emaildispatcher.config.ElasticSearchConfig;
+import com.org.emaildispatcher.mapper.EmailFailRepository;
+import com.org.emaildispatcher.mapper.EmailTaskRepository;
+import com.org.emaildispatcher.mapper.EmailUserRepository;
 import com.org.emaildispatcher.model.BufferData;
-import com.org.emaildispatcher.model.EmailRedisModel;
-import com.org.emaildispatcher.util.ElasticSearchUtil;
 import com.org.emaildispatcher.util.RedisUtil;
-import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
@@ -30,25 +29,24 @@ public class DecisionMaker {
     @Resource
     private ThreadPoolTaskExecutor threadPool;
     @Resource
-    private ElasticSearchUtil elasticSearchUtil;
+    private EmailTaskRepository emailTaskRepository;
+    @Resource
+    private EmailUserRepository emailUserRepository;
+    @Resource
+    private EmailFailRepository emailFailRepository;
 
     private final long SLEEP_TIME = 100;
 
+    /**
+     * 从缓冲区中取出待发送的邮件
+     */
     @Async
     public void run(){
         log.info("控制中心已启动");
         while (true){
             BufferData data = BufferQueue.getData();
             log.info("bufferQueue消息已到达控制中心:{}", data);
-            String redisKey = data.getRedisKey();
-//            //从redis里面取出邮件任务
-//            EmailRedisModel emailTask = redisEmailTaskProvider.getRedisTask(reidKey);
-//            //检查邮件是否完整
-//            if (!EmailTaskChecker.checkEmail(emailTask)) {
-//                //说明邮件有不完整的地方
-//                log.error("{}邮件不完整", reidKey);
-//                continue;
-//            }
+            String emailId = data.getEmailId();
 
             while (true) {
                 // 投递任务
@@ -65,7 +63,7 @@ public class DecisionMaker {
                 }
             }
             //将邮件投递给线程池
-            threadPool.execute(new EmailProcessingUnit(redisKey, redisUtil, rocketMQ, elasticSearchUtil));
+            threadPool.execute(new EmailProcessingUnit(emailId, rocketMQ, emailTaskRepository, emailUserRepository, emailFailRepository));
         }
     }
 
