@@ -1,6 +1,7 @@
 package com.org.sendmail.Util;
 
 
+import com.org.sendmail.model.UndeliveredEmail;
 import com.sun.mail.util.MailSSLSocketFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -37,10 +38,13 @@ public class InitSendEmailData {
         properties.setProperty("mail.smtp.host", host); // 设置邮件服务器
     }
 
-    public void sendEmail(String subject, String text, Session session, String accepterEmail){
+    public UndeliveredEmail sendEmail(String subject, String text, Session session, String accepterEmail){
+        UndeliveredEmail undeliveredEmail = new UndeliveredEmail();
         if (session == null){
             log.error("获取邮件SSL失败");
-            return ;
+            undeliveredEmail.setError_msg("邮件SSL配置失效");
+            undeliveredEmail.setError_code(500);
+            return undeliveredEmail;
         }
         MimeMessage mimeMessage = new MimeMessage(session);
         try {
@@ -52,10 +56,15 @@ public class InitSendEmailData {
         } catch (MessagingException e) {
             log.error("{}邮件发送失败", accepterEmail);
             e.printStackTrace();
-            return;
+            undeliveredEmail.setError_msg("邮件服务器发送达到上限, 请稍后再试");
+            undeliveredEmail.setError_code(500);
+            return undeliveredEmail;
         }
         long nowTime = System.currentTimeMillis() / 1000; //秒级
-        log.info("{} 邮件成功发送: {}->{}", senderEmail, accepterEmail, TimestampToDate.toTime(nowTime));
+        log.info("{} 邮件成功发送: {}->{}", TimestampToDate.toTime(nowTime), senderEmail, accepterEmail);
+        undeliveredEmail.setError_msg("邮件发送成功");
+        undeliveredEmail.setError_code(200);
+        return undeliveredEmail;
     }
 
     public Session createSSLSocket(){
@@ -65,7 +74,6 @@ public class InitSendEmailData {
             mailSSLSocketFactory = new MailSSLSocketFactory();
             mailSSLSocketFactory.setTrustAllHosts(true);
             properties.put("mail.smtp.ssl.socketFactory", mailSSLSocketFactory);
-            //这里可以设计成往Redis里面塞 从redis里面取
             session = Session.getDefaultInstance(properties,new Authenticator(){
                 public PasswordAuthentication getPasswordAuthentication(){
                     return new PasswordAuthentication(senderEmail, authCode);	 	//发件人邮件用户名、授权码
@@ -77,6 +85,8 @@ public class InitSendEmailData {
         }
         return session;
     }
+
+
 
 
 

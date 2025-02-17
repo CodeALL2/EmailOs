@@ -2,6 +2,10 @@ package com.org.sendmail.emailsend;
 
 import com.org.sendmail.Util.RedisUtil;
 import com.org.sendmail.common.BufferQueue;
+import com.org.sendmail.mapper.EmailDataInfo;
+import com.org.sendmail.mapper.EmailFailRepository;
+import com.org.sendmail.mapper.EmailStatueRepository;
+import com.org.sendmail.mapper.EmailTaskRepository;
 import com.org.sendmail.model.EmailModel;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
@@ -25,7 +29,16 @@ public class EmailDispatcher {
     private ThreadPoolTaskExecutor threadPool;
 
     @Resource
-    private RedisUtil redisUtil;
+    private EmailTaskRepository emailTaskRepository;
+
+    @Resource
+    private EmailDataInfo emailDataInfo;
+
+    @Resource
+    private EmailStatueRepository emailStatueRepository;
+
+    @Resource
+    private EmailFailRepository emailFailRepository;
 
     @PostConstruct
     public void startEmailDispatcher(){
@@ -43,7 +56,7 @@ public class EmailDispatcher {
 
             if (emailIsNull(email)){
                 //1.1 如果邮件取出为空 则记录日志
-                logger.error("邮件取出为空 及时排查emailQueue队列");
+                logger.error("邮件取出为空 排查emailQueue队列");
                 continue;
             }
 
@@ -51,7 +64,7 @@ public class EmailDispatcher {
             //   基于最少连接算法 选择线程池任务最少的线程池 每次选择任务最少的线程池来执行。
             while (true) {
                 //3. 投递任务
-                //   投递任务之前 判断一下选取的线程是否已经满载
+                //   投递任务之前 判断一下线程池是否已经满载
                 if (!threadPoolIsFull(threadPool)) {
                     //3.1 如果未满载 则投递任务
                     break;
@@ -65,7 +78,7 @@ public class EmailDispatcher {
             }
 
             //4.投递任务
-            threadPool.execute(new EmailSender(email, redisUtil));
+            threadPool.execute(new EmailSender(email, emailTaskRepository, emailDataInfo, emailStatueRepository, emailFailRepository));
         }
     }
 

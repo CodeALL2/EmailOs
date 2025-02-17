@@ -28,11 +28,15 @@ public class EmailListener implements RocketMQListener<MessageExt> {
         //1. 获取消息体
         byte[] body = messageExt.getBody();
         //2. 将字节流序列化成emailModel实体类
-        String json = new String(body, StandardCharsets.UTF_8);
-        EmailModel emailModel = JSON.parseObject(json, EmailModel.class);
-        logger.info("Sending EmailModel to queue: {}", emailModel);
-        //3. 将邮件投向缓冲队列
-        BufferQueue.sendEmailToQueue(emailModel);
+        try {
+            String json = new String(body, StandardCharsets.UTF_8);
+            EmailModel emailModel = JSON.parseObject(json, EmailModel.class);
+            logger.info("Sending EmailModel to queue: {}", emailModel);
+            //3. 将邮件投向缓冲队列
+            BufferQueue.sendEmailToQueue(emailModel);
+        }catch (Exception e){
+            System.out.println(e);
+        }
     }
 
 }
