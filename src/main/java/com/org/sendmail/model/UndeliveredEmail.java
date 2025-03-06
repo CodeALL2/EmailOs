@@ -1,5 +1,6 @@
 package com.org.sendmail.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 @AllArgsConstructor
 @NoArgsConstructor
 @Document(indexName = "undelivered_email")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UndeliveredEmail {
     @Id
     private String email_id; //主键
@@ -43,10 +45,9 @@ public class UndeliveredEmail {
     @Field(type = FieldType.Keyword)
     private Long end_date; //邮件的投递
 
+    private Long opened; //默认为1
 
-    @Field(type = FieldType.Long)
-    private Long created_at; //任务创建时间
+    private String subject;
 
-    @Field(type = FieldType.Long)
-    private Long updated_at; //修改时间
+
 }

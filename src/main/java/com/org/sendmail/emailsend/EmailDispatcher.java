@@ -2,10 +2,7 @@ package com.org.sendmail.emailsend;
 
 import com.org.sendmail.Util.RedisUtil;
 import com.org.sendmail.common.BufferQueue;
-import com.org.sendmail.mapper.EmailDataInfo;
-import com.org.sendmail.mapper.EmailFailRepository;
-import com.org.sendmail.mapper.EmailStatueRepository;
-import com.org.sendmail.mapper.EmailTaskRepository;
+import com.org.sendmail.mapper.*;
 import com.org.sendmail.model.EmailModel;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
@@ -26,6 +23,9 @@ public class EmailDispatcher {
     private final long SLEEP_TIME = 100;
 
     @Resource
+    private EmailCountryRepository emailCountryRepository;
+
+    @Resource
     private ThreadPoolTaskExecutor threadPool;
 
     @Resource
@@ -39,6 +39,15 @@ public class EmailDispatcher {
 
     @Resource
     private EmailFailRepository emailFailRepository;
+
+    @Resource
+    private EmailSupplierRepository emailSupplierRepository;
+
+    @Resource
+    private EmailCustomerRepository emailCustomerRepository;
+
+    @Resource
+    private EmailReportRepository emailReportRepository;
 
     @PostConstruct
     public void startEmailDispatcher(){
@@ -78,7 +87,7 @@ public class EmailDispatcher {
             }
 
             //4.投递任务
-            threadPool.execute(new EmailSender(email, emailTaskRepository, emailDataInfo, emailStatueRepository, emailFailRepository));
+            threadPool.execute(new EmailSender(email, emailTaskRepository, emailDataInfo, emailStatueRepository, emailFailRepository, emailSupplierRepository, emailCustomerRepository, emailReportRepository,emailCountryRepository));
         }
     }
 

@@ -1,5 +1,6 @@
 package com.org.sendmail.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 @AllArgsConstructor
 @NoArgsConstructor
 @Document(indexName = "email_user") // 指定索引名称
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class EmailUser implements Serializable{
     /**
      * 普通用户的id
@@ -47,6 +49,6 @@ public class EmailUser implements Serializable{
 
     private Long created_at; //任务创建时间
 
-    private Long update_at; //修改时间
+    private Long updated_at; //修改时间
 
 }

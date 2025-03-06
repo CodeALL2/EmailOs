@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -26,7 +28,7 @@ public class EmailUserRepositoryImp implements EmailUserRepository {
         try {
             // 构建查询请求
             SearchRequest searchRequest = SearchRequest.of(s -> s
-                    .index("email_user") // 索引名称
+                    .index("user") // 索引名称
                     .query(Query.of(q -> q
                             .term(t -> t
                                     .field("user_email") // 字段名称
@@ -51,4 +53,31 @@ public class EmailUserRepositoryImp implements EmailUserRepository {
         // 如果没有匹配结果或发生错误，返回 null
         return null;
     }
+
+    @Override
+    public List<EmailUser> findAllBoos(Integer roleId) {
+        try {
+            SearchResponse<EmailUser> response = elasticsearchClient.search(s -> s
+                            .index("user") // 索引名称
+                            .query(q -> q
+                                    .term(t -> t
+                                            .field("user_role") // 查询 `user_role` 字段
+                                            .value(roleId)
+                                    )
+                            ),
+                    EmailUser.class
+            );
+
+            return response.hits().hits().stream()
+                    .map(hit -> hit.source()) // 提取 source 数据
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+
+        } catch (Exception e) {
+            log.error("Elasticsearch 状态异常，roleId: {}，错误信息: {}", roleId, e.getMessage(), e);
+        }
+        return null;
+    }
+
+
 }

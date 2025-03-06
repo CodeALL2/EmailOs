@@ -42,7 +42,7 @@ public class InitSendEmailData {
         UndeliveredEmail undeliveredEmail = new UndeliveredEmail();
         if (session == null){
             log.error("获取邮件SSL失败");
-            undeliveredEmail.setError_msg("邮件SSL配置失效");
+            undeliveredEmail.setError_msg("服务器配置错误");
             undeliveredEmail.setError_code(500);
             return undeliveredEmail;
         }
@@ -56,8 +56,8 @@ public class InitSendEmailData {
         } catch (MessagingException e) {
             log.error("{}邮件发送失败", accepterEmail);
             e.printStackTrace();
-            undeliveredEmail.setError_msg("邮件服务器发送达到上限, 请稍后再试");
-            undeliveredEmail.setError_code(500);
+            undeliveredEmail.setError_msg("1、邮箱发送到达上限。2、发件人邮箱或授权码填写错误。3、收件人邮箱填写错误");
+            undeliveredEmail.setError_code(535);
             return undeliveredEmail;
         }
         long nowTime = System.currentTimeMillis() / 1000; //秒级

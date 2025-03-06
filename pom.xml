@@ -69,6 +69,13 @@
             <version>2.15.0</version>
         </dependency>
 
+        <!--quartz-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-quartz</artifactId>
+        </dependency>
+
+
 
         <!--fastjson-->
         <dependency>

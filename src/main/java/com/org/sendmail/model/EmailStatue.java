@@ -1,5 +1,6 @@
 package com.org.sendmail.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 @AllArgsConstructor
 @NoArgsConstructor
 @Document(indexName = "email_statue") // 指定索引名称
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class EmailStatue {
     @Id
     private String email_id; //主键
@@ -26,5 +28,5 @@ public class EmailStatue {
     private Long created_at; //创建时间
 
     @Field(type = FieldType.Long)
-    private Long update_at; //修改时间
+    private Long updated_at; //修改时间
 }

@@ -20,7 +20,7 @@ public class EmailDataInfoImp implements EmailDataInfo {
     public void save(UndeliveredEmail undeliveredEmail) {
         try {
             IndexResponse response = elasticsearchClient.index(IndexRequest.of(i -> i
-                    .index("undelivered_email") // 指定索引名称
+                    .index("email_details") // 指定索引名称
                     .id(undeliveredEmail.getEmail_id()) // 指定主键
                     .document(undeliveredEmail) // 插入的文档
             ));

@@ -25,7 +25,7 @@ public class EmailStatueRepositoryImp implements EmailStatueRepository {
     public EmailStatue findByTaskId(String taskId) {
         try {
             SearchResponse<EmailStatue> response = elasticsearchClient.search(s -> s
-                            .index("email_statue")
+                            .index("email")
                             .query(q -> q
                                     .match(m -> m
                                             .field("email_task_id")
@@ -66,7 +66,7 @@ public class EmailStatueRepositoryImp implements EmailStatueRepository {
             if (emailStatue.getCreated_at() == null) {
                 emailStatue.setCreated_at(currentTime);
             }
-            emailStatue.setUpdate_at(currentTime);
+            emailStatue.setUpdated_at(currentTime);
 
             // 验证状态值
             if (emailStatue.getEmail_status() == null ||
@@ -77,7 +77,7 @@ public class EmailStatueRepositoryImp implements EmailStatueRepository {
 
             // 构建索引请求
             IndexResponse response = elasticsearchClient.index(i -> i
-                    .index("email_statue")
+                    .index("email")
                     .id(emailStatue.getEmail_id())
                     .document(emailStatue)
                     .refresh(Refresh.True)  // 立即刷新，使文档可搜索

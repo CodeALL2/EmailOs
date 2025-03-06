@@ -1,5 +1,6 @@
 package com.org.sendmail.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,10 +17,11 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 @AllArgsConstructor
 @NoArgsConstructor
 @Document(indexName = "email_fail")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class EmailFail {
     //邮件重发id
     @Id
-    private String email_resend_id; //邮件任务id
+    private String email_resend_id; //邮件重发id
 
     @Field(type = FieldType.Keyword)
     private String email_task_id; //邮件任务id
@@ -28,7 +30,7 @@ public class EmailFail {
     private String accepter_email; //接受者的邮箱
 
     @Field(type = FieldType.Long)
-    private Long statue = 0L; //默认未重发
+    private Long status = 0L; //默认未重发
 
     @Field(type = FieldType.Text)
     private String error_msg; //重发错误信息
