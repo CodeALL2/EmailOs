@@ -55,6 +55,7 @@ public class EmailProcessingUnit implements Runnable{
                 return;
             }
             emailId = emailFail.getEmail_task_id();
+            emailModelRocketMq.setSendTime(String.valueOf(System.currentTimeMillis() / 1000));
             pushToRocket(emailModelRocketMq);
             return;
         }
@@ -85,7 +86,6 @@ public class EmailProcessingUnit implements Runnable{
         emailModelRocketMq.setAccepterEmail(new ArrayList<String>(emailModel.getReceiver_id()));
         emailModelRocketMq.setSendTime(String.valueOf(nowTime));
         emailModelRocketMq.setAccepterName(emailModel.getReceiver_name());
-
         log.info("{}邮件已成功打包完毕", emailModelRocketMq);
 
         String json = JSON.toJSONString(emailModelRocketMq);

@@ -61,6 +61,7 @@ public class TimeTask {
         }
 
         for (Object value : tasksToExecute) {
+            System.out.println(value);
             String emailId = (String) value;
             //重发的业务key  resend|3
             String[] parts = emailId.split("\\|"); // 按竖线拆分
@@ -116,9 +117,9 @@ public class TimeTask {
                 }
 
                 switch (emailModel.getTask_type()) {
-                    case 0 -> emailSendTypeHandler.handleSingleEmail(emailModel.getEmail_task_id()); // 单封邮件
-                    case 2 -> emailSendTypeHandler.handleScheduledEmail(emailModel.getEmail_task_id()); // 定时邮件
-                    case 1 -> emailSendTypeHandler.handleLoopEmail(emailModel.getEmail_task_id(), emailModel, nowTime); // 循环邮件
+                    case 1 -> emailSendTypeHandler.handleSingleEmail(emailModel.getEmail_task_id()); // 单封邮件
+                    case 3 -> emailSendTypeHandler.handleScheduledEmail(emailModel.getEmail_task_id()); // 定时邮件
+                    case 2 -> emailSendTypeHandler.handleLoopEmail(emailModel.getEmail_task_id(), emailModel, nowTime); // 循环邮件
                     default -> redisUtil.deleteZSetKey(emailId);
                 }
                 // 将当前任务加入缓冲队列

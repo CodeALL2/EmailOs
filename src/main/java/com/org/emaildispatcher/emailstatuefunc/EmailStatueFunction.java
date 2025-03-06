@@ -54,29 +54,30 @@ public class EmailStatueFunction {
     public void statueFourFunc(EmailStatue emailStatue){
         //获取邮件实体
         EmailTask emailModel = emailTaskRepository.findByTaskId(emailStatue.getEmail_task_id());
-        log.info("状态码 4 暂停方法被执行");
+        log.info("状态码 4 重置方法被执行");
         if (emailModel != null) {
-            log.info("{} 邮件发送时间已重置", emailStatue.getEmail_task_id());
-            long startTime = emailModel.getStart_date();
-            long endTime = emailModel.getEnd_date();
-            long nowTime = System.currentTimeMillis() / 1000;
-            //重置截止时间 计算公式为 截止时间加上(当前时间减去 startTime)
-            emailModel.setEnd_date(endTime + nowTime - startTime);
-            emailModel.setStart_date(nowTime);
-            emailModel.setIndex(0);
+//            log.info("{} 邮件发送时间已重置", emailStatue.getEmail_task_id());
+//            long startTime = emailModel.getStart_date();
+//            long endTime = emailModel.getEnd_date();
+//            long nowTime = System.currentTimeMillis() / 1000;
+//            //重置截止时间 计算公式为 截止时间加上(当前时间减去 startTime)
+//            emailModel.setEnd_date(endTime + nowTime - startTime);
+//            emailModel.setStart_date(nowTime);
+//            emailModel.setIndex(0);
             //替换成将elasticsearch中的邮件属性重置
-            log.info("{} 邮件已在redis中重置", emailStatue.getEmail_task_id());
+            //log.info("{} 邮件已在redis中重置", emailStatue.getEmail_task_id());
             //将邮件重新塞入到es中
-            emailTaskRepository.save(emailModel);
+            //emailTaskRepository.save(emailModel);
             //将elasticsearch中的邮件状态表改为1
-            log.info("{} 邮件已在邮件状态表中重置", emailModel.getEmail_task_id());
+            //log.info("{} 邮件已在邮件状态表中重置", emailModel.getEmail_task_id());
             EmailStatue emailStatueModel = emailStatueRepository.findByTaskId(emailStatue.getEmail_task_id());
-            emailStatueModel.setEmail_status(1);
+            emailStatueModel.setEmail_status(6);
+            log.info("{} 邮件状态已修改为完成", emailStatue.getEmail_task_id());
             emailStatueRepository.save(emailStatueModel);
             log.info("{} 邮件已在邮件发送队列中移出", emailStatue.getEmail_task_id());
             redisUtil.deleteZSetKey(emailStatue.getEmail_task_id());
-            log.info("{} 邮件已添加到发送队列", emailStatue.getEmail_task_id());
-            redisUtil.addTimerTask(emailStatue.getEmail_task_id(), nowTime);
+//            log.info("{} 邮件已添加到发送队列", emailStatue.getEmail_task_id());
+//            redisUtil.addTimerTask(emailStatue.getEmail_task_id(), nowTime);
         }
     }
 }

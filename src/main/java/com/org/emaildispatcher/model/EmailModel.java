@@ -19,6 +19,7 @@ public class EmailModel implements Serializable {
     private String host; //邮件服务器类型  smtp.qq.com, smtp.163.com ...
     private String senderEmail; //发件人邮箱
     private String senderName; //发件人Name
+    private String phone; //发件人联系方式
     private String authCode; //授权码
     private ArrayList<String> accepterEmail; //接受者的邮箱
     private ArrayList<String> accepterName; //接受者的邮箱Name

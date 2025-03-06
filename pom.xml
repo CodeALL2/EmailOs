@@ -67,7 +67,7 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
-            <version>2.0.34</version>
+            <version>1.2.78</version>
         </dependency>
 
         <!--rocketmq-->

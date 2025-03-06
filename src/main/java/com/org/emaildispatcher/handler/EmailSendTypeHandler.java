@@ -47,7 +47,7 @@ public class EmailSendTypeHandler {
             log.info("任务{}为循环邮件，准备发送下一封", emailId);
             long nextEmailTime = Long.parseLong(String.valueOf(emailModel.getInterval_date())) + nowTime;
             emailModel.setIndex(emailModel.getIndex() + 1); // 指针移动
-            emailModel.setStart_date(nextEmailTime); // 设置下一封发送时间
+            //emailModel.setStart_date(nextEmailTime); // 设置下一封发送时间
             log.info("任务{}的下一封邮件发送时间为：{}", emailId, TimestampToDate.toTime(nextEmailTime));
             emailTaskRepository.save(emailModel);
             redisUtil.deleteZSetKey(emailId); // 删除顺序队列中的消息 key

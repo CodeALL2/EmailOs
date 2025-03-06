@@ -6,8 +6,8 @@ server:
 spring:
   data:
     redis:
-      host: 127.0.0.1
-      port: 6379
+      host: 112.35.176.43
+      port: 9500
       timeout: 60000
       lettuce:
         pool:
@@ -16,8 +16,8 @@ spring:
           min-idle: 0
           max-wait: -1ms
 elasticsearch:
-  host: 127.0.0.1
-  port: 9200
+  host: 112.35.176.43
+  port: 9201
 
 timerQueue:
   name: TIMER_TASK

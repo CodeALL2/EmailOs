@@ -25,7 +25,7 @@ public class EmailFailImp implements EmailFailRepository {
     public EmailFail findById(String id) {
         try {
             GetResponse<EmailFail> response = elasticsearchClient.get(g -> g
-                            .index("email_fail")  // 指定索引名称
+                            .index("resend_details")  // 指定索引名称
                             .id(id),  // 按 `_id` 查询
                     EmailFail.class
             );
@@ -53,7 +53,7 @@ public class EmailFailImp implements EmailFailRepository {
     public void save(EmailFail emailFail) {
         try {
             IndexResponse response = elasticsearchClient.index(i -> i
-                    .index("email_fail")  // 索引名称
+                    .index("email_details")  // 索引名称
                     .id(emailFail.getEmail_resend_id())  // 使用 email_resend_id 作为主键
                     .document(emailFail)  // 存入的对象
             );

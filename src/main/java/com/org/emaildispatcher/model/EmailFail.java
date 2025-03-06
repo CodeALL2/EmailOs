@@ -1,5 +1,6 @@
 package com.org.emaildispatcher.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,8 +16,10 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(indexName = "email_fail")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class EmailFail {
+
+    private String email_id;  // 确保这个字段存在
     //邮件重发id
     @Id
     private String email_resend_id; //邮件任务id

@@ -1,6 +1,7 @@
 package com.org.emaildispatcher.mapper.imp;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
@@ -13,6 +14,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -27,7 +30,7 @@ public class EmailUserRepositoryImp implements EmailUserRepository {
 
             // 执行查询
             SearchResponse<EmailUser> response = elasticsearchClient.search(
-                    s -> s.index("email_user").query(query),
+                    s -> s.index("user").query(query),
                     EmailUser.class
             );
 
@@ -45,4 +48,30 @@ public class EmailUserRepositoryImp implements EmailUserRepository {
             throw new RuntimeException("查询用户失败：" + e.getMessage());
         }
     }
+
+    @Override
+    public List<EmailUser> findAllBoos(Integer roleId) {
+        try {
+            SearchResponse<EmailUser> response = elasticsearchClient.search(s -> s
+                            .index("user") // 索引名称
+                            .query(q -> q
+                                    .term(t -> t
+                                            .field("user_role") // 查询 `user_role` 字段
+                                            .value(roleId)
+                                    )
+                            ),
+                    EmailUser.class
+            );
+
+            return response.hits().hits().stream()
+                    .map(hit -> hit.source()) // 提取 source 数据
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+
+        } catch (Exception e) {
+            log.error("Elasticsearch 状态异常，roleId: {}，错误信息: {}", roleId, e.getMessage(), e);
+        }
+        return null;
+    }
+
 }

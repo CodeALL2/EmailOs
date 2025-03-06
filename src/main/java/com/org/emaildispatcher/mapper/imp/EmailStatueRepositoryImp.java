@@ -32,7 +32,7 @@ public class EmailStatueRepositoryImp implements EmailStatueRepository {
 
             // 执行查询
             SearchResponse<EmailStatue> response = elasticsearchClient.search(
-                    s -> s.index("email_statue").query(query),
+                    s -> s.index("email").query(query),
                     EmailStatue.class
             );
 
@@ -64,7 +64,7 @@ public class EmailStatueRepositoryImp implements EmailStatueRepository {
             if (emailStatue.getCreated_at() == null) {
                 emailStatue.setCreated_at(currentTime);
             }
-            emailStatue.setUpdate_at(currentTime);
+            emailStatue.setUpdated_at(currentTime);
 
             // 验证状态值
             if (emailStatue.getEmail_status() == null ||
@@ -75,7 +75,7 @@ public class EmailStatueRepositoryImp implements EmailStatueRepository {
 
             // 构建索引请求
             IndexResponse response = elasticsearchClient.index(i -> i
-                    .index("email_statue")
+                    .index("email")
                     .id(emailStatue.getEmail_id())
                     .document(emailStatue)
                     .refresh(Refresh.True)  // 立即刷新，使文档可搜索

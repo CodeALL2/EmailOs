@@ -54,16 +54,6 @@ public class EmailTaskRepositoryImp implements EmailTaskRepository {
     @Override
     public void save(EmailTask emailTask) {
         try {
-            // 如果没有ID，生成一个
-            if (emailTask.getEmail_id() == null || emailTask.getEmail_id().isEmpty()) {
-                emailTask.setEmail_id(UUID.randomUUID().toString());
-            }
-
-            // 如果没有创建时间，设置当前时间
-            if (emailTask.getCreated_at() == null) {
-                emailTask.setCreated_at(System.currentTimeMillis() / 1000);
-            }
-
             // 构建索引请求
             IndexResponse response = elasticsearchClient.index(i -> i
                     .index("email_task")  // 索引名称
