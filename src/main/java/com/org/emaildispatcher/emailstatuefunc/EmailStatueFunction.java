@@ -70,10 +70,10 @@ public class EmailStatueFunction {
             //emailTaskRepository.save(emailModel);
             //将elasticsearch中的邮件状态表改为1
             //log.info("{} 邮件已在邮件状态表中重置", emailModel.getEmail_task_id());
-            EmailStatue emailStatueModel = emailStatueRepository.findByTaskId(emailStatue.getEmail_task_id());
-            emailStatueModel.setEmail_status(6);
-            log.info("{} 邮件状态已修改为完成", emailStatue.getEmail_task_id());
-            emailStatueRepository.save(emailStatueModel);
+            //EmailStatue emailStatueModel = emailStatueRepository.findByTaskId(emailStatue.getEmail_task_id());
+            //emailStatueModel.setEmail_status(6);
+            //log.info("{} 邮件状态已修改为完成", emailStatue.getEmail_task_id());
+            //emailStatueRepository.save(emailStatueModel);
             log.info("{} 邮件已在邮件发送队列中移出", emailStatue.getEmail_task_id());
             redisUtil.deleteZSetKey(emailStatue.getEmail_task_id());
 //            log.info("{} 邮件已添加到发送队列", emailStatue.getEmail_task_id());
