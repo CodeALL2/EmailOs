@@ -83,5 +83,37 @@ public class EmailReportRepositoryImp implements EmailReportRepository {
         }
     }
 
+    @Override
+    public void updateEmailTotal(String email_task_id, int emailTotal) {
+        try {
+            UpdateResponse<EmailReport> response = elasticsearchClient.update(u -> u
+                            .index("email_report") // ES 索引名
+                            .id(email_task_id) // 文档 ID
+                            .script(s -> s
+                                    .inline(i -> i
+                                            .lang("painless") // Painless 脚本
+                                            .source("ctx._source.email_total = params.emailTotal") // 更新 email_total
+                                            .params(Map.of("emailTotal", JsonData.of(emailTotal))) // 传递参数
+                                    )
+                            ),
+                    EmailReport.class
+            );
+
+            if ("UPDATED".equals(response.result().name())) {
+                log.info("成功更新 email_total，email_task_id: {}，新值: {}", email_task_id, emailTotal);
+            } else {
+                log.warn("未找到 email_task_id: {}", email_task_id);
+            }
+
+        } catch (ElasticsearchException e) {
+            log.error("Elasticsearch 更新错误，email_task_id: {}，错误信息: {}", email_task_id, e.getMessage(), e);
+            throw new RuntimeException("Elasticsearch 更新失败", e);
+        } catch (IOException e) {
+            log.error("IO 异常，更新失败，email_task_id: {}，错误信息: {}", email_task_id, e.getMessage(), e);
+            throw new RuntimeException("更新任务失败", e);
+        }
+    }
+
+
 
 }

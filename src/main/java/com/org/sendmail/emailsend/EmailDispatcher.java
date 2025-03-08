@@ -49,6 +49,9 @@ public class EmailDispatcher {
     @Resource
     private EmailReportRepository emailReportRepository;
 
+    @Resource
+    private EmailContentRepository emailContentRepository;
+
     @PostConstruct
     public void startEmailDispatcher(){
         Thread emailDispatcherThread = new Thread(this::emailDispatcherLoop);
@@ -87,7 +90,7 @@ public class EmailDispatcher {
             }
 
             //4.投递任务
-            threadPool.execute(new EmailSender(email, emailTaskRepository, emailDataInfo, emailStatueRepository, emailFailRepository, emailSupplierRepository, emailCustomerRepository, emailReportRepository,emailCountryRepository));
+            threadPool.execute(new EmailSender(email, emailTaskRepository, emailDataInfo, emailStatueRepository, emailFailRepository, emailSupplierRepository, emailCustomerRepository, emailReportRepository,emailCountryRepository, emailContentRepository));
         }
     }
 

@@ -40,8 +40,21 @@ public class BirthTimeTask {
     @Resource
     private EmailCountryRepository emailCountryRepository;
 
+    @Resource
+    private EmailContentRepository emailContentRepository;
 
-    @Scheduled(cron = "0 0 0 * * ?")
+    @Resource
+    private EmailReportRepository emailReportRepository;
+
+    private int totalSum; //总共
+
+    private int bounceAmount;  //退信
+
+    private int deliveryAmount; //送达
+
+
+    //@Scheduled(cron = "0 0 0 * * ?") 凌晨执行
+    @Scheduled(cron = "0 * * * * ?") //分钟触发
     public void executeTasks(){
         //当前时间的时间戳
         long nowTime = System.currentTimeMillis() / 1000;
@@ -76,6 +89,8 @@ public class BirthTimeTask {
 
         log.info("当天有{}个用户生日", sumPerson);
 
+        this.totalSum = sumPerson;
+
         if (managerCount == 0 || sumPerson == 0) {
             log.warn("没有管理者或没有用户在当天生日");
             return;
@@ -104,6 +119,7 @@ public class BirthTimeTask {
             log.info("管理员: {} 分配了 {} 个任务", entry.getKey().getUser_name(), entry.getValue().size());
         }
 
+        String emailContent = emailContentRepository.findContentById("birth");
         //替换文本
         HashMap<String, String> replaceMap = new HashMap<>();
 
@@ -118,27 +134,40 @@ public class BirthTimeTask {
             Session session = initSendEmailData.createSSLSocket();
 
             for (Object o : objects){
+                String text = emailContent;
                 if (o instanceof EmailCustomer){
                     //构建邮件发送出去
                     String userEmail = ((EmailCustomer) o).getEmails().get(0);
 
                     replacePrivateContext(replaceMap, ((EmailCustomer) o).getCustomer_name(), ((EmailCustomer) o).getSex(),((EmailCustomer) o).getBirth(), ((EmailCustomer) o).getCustomer_country_id(), ((EmailCustomer) o).getContact_person(), ((EmailCustomer) o).getContact_way());
-                    String replaceContext = replaceContext(emailTask.getEmail_content(), replaceMap);
+                    String replaceContext = replaceContext(text, replaceMap);
                     send(emailTask, replaceContext, session, userEmail, ((EmailCustomer) o).getCustomer_name(), initSendEmailData, user.getUser_email(), user.getUser_name());
                 }else if (o instanceof EmailSupplier){
                     String userEmail = ((EmailSupplier) o).getEmails().get(0);
                     replacePrivateContext(replaceMap, ((EmailSupplier) o).getSupplier_name(), ((EmailSupplier) o).getSex(),((EmailSupplier) o).getBirth(), ((EmailSupplier) o).getSupplier_country_id(),((EmailSupplier) o).getContact_person(),((EmailSupplier) o).getContact_way());
-                    String replaceContext = replaceContext(emailTask.getEmail_content(), replaceMap);
+                    String replaceContext = replaceContext(text, replaceMap);
                     send(emailTask, replaceContext, session, userEmail, ((EmailSupplier) o).getSupplier_name(), initSendEmailData, user.getUser_email(), user.getUser_name());
                 }
             }
-
         }
+        emailReportRepository.addBounceAmountById("birth", bounceAmount);
+        log.info("生日发送退信数:{}", bounceAmount);
+        emailReportRepository.addDeliveryAmount("birth", deliveryAmount);
+        log.info("生日发送成功数:{}", deliveryAmount);
+        emailReportRepository.updateEmailTotal("birth", totalSum);
+        log.info("当天生日一共有{}", totalSum);
+
 
     }
 
     public void send(EmailTask emailTask, String text, Session session, String accepterEmail, String acceptName, InitSendEmailData initSendEmailData, String senderEmail, String senderName){
         UndeliveredEmail emailInfoData = initSendEmailData.sendEmail(emailTask.getSubject(), text, session, accepterEmail);
+        if (emailInfoData.getError_code().equals(500) || emailInfoData.getError_code().equals(535)){
+            this.bounceAmount++;
+        }else {
+            this.deliveryAmount++;
+        }
+
         emailInfoOut(emailTask,emailInfoData, accepterEmail, acceptName, senderEmail, senderName);
     }
 
@@ -161,8 +190,7 @@ public class BirthTimeTask {
         if (emailInfoData.getError_code().equals(535) || emailInfoData.getError_code().equals(500)){
             //插入到未送达的重发表中去
             EmailFail emailFail = new EmailFail();
-            String id = UUID.randomUUID().toString();
-            emailFail.setEmail_resend_id(id);
+            emailFail.setEmail_resend_id(uuid);
             emailFail.setAccepter_email(acceptEmail);
             emailFail.setStatus(0L);
             emailFail.setEmail_task_id("birth");

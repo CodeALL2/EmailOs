@@ -32,6 +32,7 @@ public class EmailSender implements Runnable{
     private EmailCustomerRepository emailCustomerRepository;
     private EmailReportRepository emailReportRepository;
     private EmailCountryRepository emailCountryRepository;
+    private EmailContentRepository emailContentRepository;
 
     private static ArrayList<String> replaceContext = new ArrayList<>();
 
@@ -51,7 +52,8 @@ public class EmailSender implements Runnable{
     public EmailSender(EmailModel emailModel, EmailTaskRepository emailElasticSearchRepository, EmailDataInfo emailDataInfo,
                        EmailStatueRepository emailStatueRepository, EmailFailRepository emailFailRepository,
                        EmailSupplierRepository emailSupplierRepository, EmailCustomerRepository emailCustomerRepository,
-                       EmailReportRepository emailReportRepository, EmailCountryRepository emailCountryRepository
+                       EmailReportRepository emailReportRepository, EmailCountryRepository emailCountryRepository,
+                       EmailContentRepository emailContentRepository
     ){
         this.emailModel = emailModel;
         this.emailTaskRepository = emailElasticSearchRepository;
@@ -62,6 +64,7 @@ public class EmailSender implements Runnable{
         this.emailCustomerRepository = emailCustomerRepository;
         this.emailReportRepository = emailReportRepository;
         this.emailCountryRepository = emailCountryRepository;
+        this.emailContentRepository = emailContentRepository;
     }
 
     @Override
@@ -89,6 +92,7 @@ public class EmailSender implements Runnable{
         }
         String subject = email.getSubject();
         String text;
+        String emailContent = emailContentRepository.findContentById(emailModel.getOperationId());
 
         //替换文本
         HashMap<String, String> replaceMap = new HashMap<>();
@@ -104,7 +108,7 @@ public class EmailSender implements Runnable{
 
         if (email.getTask_type() == 1 || email.getTask_type() == 3) { //普通邮件一次性发完
             for (int i = 0; i < accepterEmail.size(); i++) {
-                text = email.getEmail_content();
+                text = emailContent;
                 //查询
                 if ((emailCustomer = emailCustomerRepository.findByEmail(accepterEmail.get(i))) != null){
                     System.out.println("收件人信息替换curstomer" + emailCustomer.toString());
@@ -135,7 +139,7 @@ public class EmailSender implements Runnable{
 
 
         }else if(email.getTask_type() == 2){ //循环发送
-            text = email.getEmail_content();
+            text = emailContent;
             if (email.getIndex() < 0 ||email.getIndex() - 1 >= accepterEmail.size()){
                 log.warn("循环邮件下标越界  index:{} 接受者一共有 {}", email.getIndex(), accepterEmail.size());
                 email.setEnd_date(System.currentTimeMillis() / 1000);
@@ -212,6 +216,7 @@ public class EmailSender implements Runnable{
         logger.info("重发包邮件id{}", resendId);
         //从数据库中取出接受者
         EmailFail emailFail = emailFailRepository.findById(resendId);
+        String emailContent = emailContentRepository.findContentById(emailModel.getOperationId());
 
         if (emailFail == null){
             log.error("没有找到重发邮件");
@@ -238,7 +243,7 @@ public class EmailSender implements Runnable{
             replacePrivateContext(replaceMap, emailSupplier.getSupplier_name(), emailSupplier.getSex(), emailSupplier.getBirth(), emailSupplier.getSupplier_country_id(),email.getEmail_task_id(), accepterEmail, emailSupplier.getContact_person(), emailSupplier.getContact_way());
         }
 
-        String text = replaceContext(email.getEmail_content(), replaceMap);
+        String text = replaceContext(emailContent, replaceMap);
         System.out.println("邮箱内容：" +  text);
 
         UndeliveredEmail undeliveredEmail = initSendEmailData.sendEmail(email.getSubject(), text, session, accepterEmail);
